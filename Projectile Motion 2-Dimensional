@@ -1,0 +1,77 @@
+from vpython import *
+
+scene = canvas(background=color.black)
+
+ground = box(pos=vec(0,-0.02,0), size=vec(3,0.02,0.4), color=color.green)
+
+v0 = 4.0 # m/s
+g = 9.81 # m/(s^2)
+h = 0.5 # m
+x0 = -1 # m
+theta = 35*pi/180
+
+ball = sphere(pos=vec(x0,h,0), mass = 0.5, angle=theta, radius=0.01,
+    color=color.red, make_trail=True) #, trail_type="points")
+    
+ball.v = v0*vec(cos(ball.angle), sin(ball.angle), 0)
+ball.p = ball.mass*ball.v
+
+stone = sphere(pos=vec(x0,h,0), mass = 0.5, angle=theta, radius=0.01,
+    color=color.purple, make_trail=True) #, trail_type="points")
+    
+stone_2= sphere(pos=vec(x0,h,0), mass = 0.5, angle=theta, radius=0.01,
+    color=color.cyan, make_trail=True) #, trail_type="points")
+    
+stone.v = v0*vec(cos(stone.angle), sin(stone.angle), 0)
+stone.p = stone.mass*stone.v
+
+v_graph =  graph(title='Velocity', xtitle='t', ytitle='v')
+
+v_b_x = gcurve(graph=v_graph, color=color.black)
+v_b_y = gcurve(graph=v_graph, color=color.green)
+
+v_s_x = gcurve(graph=v_graph, color=color.orange)
+v_s_y = gcurve(graph=v_graph, color=color.cyan)
+
+myrate = 200
+
+t = 0 # s
+dt = 0.001 # dt, change in s
+
+while stone.pos.y > 0:
+    
+    rate(myrate)
+    
+    F_ball = vec(0,0,0)
+    
+    ball.p = ball.p + F_ball*dt
+    ball.v = ball.p/ball.mass
+    ball.pos = ball.pos + ball.v*dt
+    
+    F_stone = stone.mass*vec(0, -g, 0)
+    
+    stone.p = stone.p + F_stone*dt
+    stone.v = stone.p/stone.mass
+    stone.pos = stone.pos + stone.v*dt
+
+    stone_2.pos = vec(x0+v0*cos(theta)*t, h+v0*sin(theta)*t - (g/2)*t**2, 0)
+    
+    v_b_x.plot(pos=(t, ball.v.x))
+    v_b_y.plot(pos=(t, ball.v.y))
+    
+    v_s_x.plot(pos=(t, stone.v.x))
+    v_s_y.plot(pos=(t, stone.v.y))
+    
+    t = t + dt
+
+d = stone.pos.x - x0
+d1 = ball.pos.x - x0
+print("Distance (stone-purple): ", d)
+print("Distance (ball-red): ", d1)
+
+
+    
+    
+    
+    
+    
