@@ -1,0 +1,124 @@
+GlowScript 3.2 VPython
+from vpython import *
+
+scene=canvas(background=color.black)
+
+G = 6.7e-11
+
+Sun = sphere(pos = vec(-1.1e11,0,0), mass = 2e24, radius = 10*7e8, color = color.orange,
+            make_trail = True)
+
+Earth = sphere(pos = vec(1.5e11,0,0), mass = 1e24, radius = 6*6.4e8, color = color.green,
+            make_trail = True)
+
+Earth.p = Earth.mass*vec(0,1e1,0)
+
+Sun.p = -Earth.p
+
+R = Earth.pos - Sun.pos 
+
+mu = 0
+
+dt = 2*30*24*60*60 
+
+gr_p = graph(title='P(t) Diagram', xtitle = 'time (s)', ytitle = "p(t)")
+Ex_plot = gcurve(graph=gr_p, color=color.orange)
+Ey_plot = gcurve(graph=gr_p, color=color.green)
+Ez_plot = gcurve(graph=gr_p, color=color.blue)
+Sx_plot = gcurve(graph=gr_p, color=color.orange)
+Sy_plot = gcurve(graph=gr_p, color=color.green)
+Sz_plot = gcurve(graph=gr_p, color=color.blue)
+ 
+gr_pt = graph(title='Total P(t) Diagram', xtitle = 'time (s)', ytitle = "P(t)")
+Et_plot = gcurve(graph=gr_pt, color=color.orange)
+St_plot = gcurve(graph=gr_pt, color=color.blue)
+SEt_plot = gcurve(graph=gr_pt, color=color.green)
+    
+gr_w = graph(title='W(t) Diagram', xtitle = 'time (s)', ytitle = "W(t)")
+KE_plot = gcurve(graph=gr_w, color=color.red)
+PE_plot = gcurve(graph=gr_w, color=color.blue)
+TE_plot = gcurve(graph=gr_w, color=color.green)
+W_plot = gcurve(graph=gr_w, color=color.purple)
+delU_plot = gcurve(graph=gr_w, color=color.yellow)
+
+gr_L = graph(title = 'L(t) Diagram', xtitle = 'time (s)', ytitle = 'L(t)')
+EL_x = gcurve(graph=gr_L, color=color.red)
+EL_y = gcurve(graph=gr_L, color=color.blue)
+EL_z = gcurve(graph=gr_L, color=color.green)
+SL_x = gcurve(graph=gr_L, color=color.red)
+SL_y = gcurve(graph=gr_L, color=color.blue)
+SL_z = gcurve(graph=gr_L, color=color.green)
+SEL_x = gcurve(graph=gr_L, color=color.red)
+SEL_y = gcurve(graph=gr_L, color=color.blue)
+SEL_z = gcurve(graph=gr_L, color=color.green)
+
+myrate = 3000
+
+t = 0
+
+work = 0 
+
+R = Earth.pos - Sun.pos
+
+PE_i = -G * Earth.mass * Sun.mass * mag(R) # G * both mass * mag(R)
+
+while (t < 15000*365*24*60*60) and (mag(R) > Sun.radius + Earth.radius): 
+
+    rate(myrate)
+    
+    F_g = (-G * Earth.mass * Sun.mass) / (mag(R)**2) * R.hat
+    
+    F_rad_E = -mu * (mag(F_g) / Earth.mass) * Earth.p.hat
+
+    F_rad_S = -mu * (mag(F_g) / Sun.mass) * Sun.p.hat
+    
+    R = Earth.pos - Sun.pos
+
+    Earth.p = Earth.p + (F_g + F_rad_E) * dt 
+    Earth.v = Earth.p / Earth.mass           
+    Earth.pos = Earth.pos + Earth.v * dt
+
+    Sun.p = Sun.p - (F_g + F_rad_S) * dt 
+    Sun.v = Sun.p / Sun.mass
+    Sun.pos = Sun.pos + Sun.v * dt
+
+    PE = -G * Earth.mass * Sun.mass * mag(R)
+    
+    KE = (mag2(Earth.p) / (2*Earth.mass)) + (mag2(Sun.p) / (2*Sun.mass))
+
+    energy = PE + KE
+    
+    work = work + (dot(F_g, Earth.v) * dt + dot(F_g, Sun.v) * dt)
+    
+    Earth.L = cross(Earth.pos, Earth.p)
+    Sun.L = cross(Sun.pos, Sun.p)
+    
+    Ex_plot.plot( pos = (t, Earth.p.x) )  
+    Ey_plot.plot( pos = (t, Earth.p.y) )  
+    Ez_plot.plot( pos = (t, Earth.p.z) )  
+    Sx_plot.plot( pos = (t, Sun.p.x) )
+    Sy_plot.plot( pos = (t, Sun.p.y) )
+    Sz_plot.plot( pos = (t, Sun.p.z) )
+    
+    Et_plot.plot( pos = (t, Earth.p.x + Sun.p.x) )
+    St_plot.plot( pos = (t, Earth.p.y + Sun.p.y) )
+    SEt_plot.plot( pos = (t, Earth.p.z + Sun.p.z) )
+    
+    W_plot.plot( pos = (t, work) )
+    KE_plot.plot( pos = (t, KE) )
+    PE_plot.plot( pos = (t, PE) )
+    TE_plot.plot( pos = (t, energy) )
+    delU_plot.plot( pos = (t, PE - PE_i) )
+    
+    EL_x.plot( pos = (t, Earth.L.x) )  
+    EL_y.plot( pos = (t, Earth.L.y) )  
+    EL_z.plot( pos = (t, Earth.L.z) )  
+    SL_x.plot( pos = (t, Sun.L.x) )
+    SL_y.plot( pos = (t, Sun.L.y) )
+    SL_z.plot( pos = (t, Sun.L.z) )
+    SEL_x.plot( pos = (t, Earth.L.x + Sun.L.x) )
+    SEL_y.plot( pos = (t, Earth.L.y + Sun.L.y) )
+    SEL_z.plot( pos = (t, Earth.L.z + Sun.L.z) )
+    
+    t = t + dt
+   
