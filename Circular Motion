@@ -1,0 +1,64 @@
+GlowScript 3.1 VPython
+from vpython import *
+
+scene = canvas(background=color.black)
+
+ball = sphere(pos=vec(100, -200, 0), mass=1, v=vec(0, 10, 0), radius=5, color=color.white,
+            make_trail=True)
+
+center = sphere(pos=vec(0, 0, 0), radius=5, color=color.red)
+
+
+gr_v = graph(title = 'velocity', xtitle= 'time (s)', ytitle='meters (m)')
+vx_plot = gcurve(graph=gr_v, color=color.red)
+vy_plot = gcurve(graph=gr_v, color=color.blue)
+
+gr_power = graph(title='Work-Energy', xtitle= 'time (s)', ytitle='N m/s')
+p_plot = gcurve(graph=gr_power, color=color.green)
+w_plot = gcurve(graph=gr_power, color=color.orange)
+
+gr_ang_mom = graph(title='Angular Momentum', xtitle = 'time (s)', ytitle = "kg m^2/s")
+lx_plot = gcurve(graph=gr_ang_mom, color=color.orange)
+ly_plot = gcurve(graph=gr_ang_mom, color=color.green)
+lz_plot = gcurve(graph=gr_ang_mom, color=color.blue)
+
+start_pos = ball.pos
+start_v = ball.v
+
+ball.p = ball.mass * ball.v
+work = 0
+
+t = 0
+dt = 0.005
+
+myrate = 2500
+
+while ball.pos.x <= 2*start_pos.x:
+    
+    rate(myrate)
+    
+    F = vec(0, 0, 0) #Intital Force
+    if ball.pos.y >= 0 or ball.pos.x <= 0:
+        r_vec = ball.pos 
+        F = -ball.mass * (ball.v.mag)**2/r_vec.mag*r_vec.hat
+        
+    w = work + dot(F, ball.v) * dt 
+    #intial work + the dot product of the force and velvoity *dt
+    ke = (1/2) * (ball.mass) * (ball.v)^2 #mag of momentum
+    ball.L = cross(ball.pos, ball.p) 
+    ball.p = ball.p + F*dt
+    ball.v =ball.p / ball.mass
+    ball.pos = ball.pos + ball.v*dt
+    
+    vx_plot.plot(pos=(t, ball.v.x))
+    vy_plot.plot(pos=(t, ball.v.y))
+    
+    p_plot.plot(pos=(t, ke))
+    w_plot.plot(pos=(t, w))
+        
+    lx_plot.plot(pos=(t, ball.L.x))
+    ly_plot.plot(pos=(t, ball.L.y))
+    lz_plot.plot(pos=(t, ball.L.z))
+    
+    t = t + dt
+    
