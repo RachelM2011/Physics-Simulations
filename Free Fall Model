@@ -1,0 +1,64 @@
+GlowScript 3.1 VPython
+from vpython import *
+
+g = 9.81
+
+m = 1
+h = 2
+vball = vector(0,0,0)
+pball = m*vball
+
+ball = sphere(pos=vector(0,h,0), radius=0.2, color=color.red)
+ground = box(pos=vector(0,-0.005,0), size=vec(5,0.01,5) , color=color.green)
+
+deltat = 0.1
+t = 0
+
+while ball.pos.y > 0.2:
+    rate(10)   
+    
+    a = vector(0,-g,0)
+    vball = vball + a*deltat
+    ball.pos = ball.pos + vball*deltat
+    t = t + deltat
+
+print ("The red (A) balls fall time is:",t) 
+
+m0 = 2
+vball = vector(0,0,0)
+pball = m0*vball
+
+ball = sphere(pos=vector(2,h,0), radius=0.2, color=color.blue)
+
+deltat = 0.1
+t = 0
+
+while ball.pos.y > 0.2:
+    rate(10)   
+    
+    a = vector(0,-g,0)
+    vball = vball + a*deltat
+    ball.pos = ball.pos + vball*deltat
+    t = t + deltat
+
+print ("The blue (B) balls fall time is:",t) 
+
+ml = 4
+vball = vector(0,0,0)
+pball = ml*vball
+
+ball = sphere(pos=vector(-2,h,0), radius=0.2, color=color.purple)
+
+deltat = 0.1
+t = 0
+
+while ball.pos.y > 0.2:
+    rate(10)   
+    
+    a = vector(0,-g,0)
+    vball = vball + a*deltat
+    ball.pos = ball.pos + vball*deltat
+    t = t + deltat
+
+print ("The purple (C) balls fall time is:",t) 
+
