@@ -1,0 +1,118 @@
+GlowScript 3.0 VPython
+from vpython import *
+
+scene = canvas(background=color.white)
+
+fix_point = sphere(pos=vec(0,2,0), radius=0.2, color=color.red)
+                # the point at which the spring is attached but wont move ^
+l_0 = 1.13      # intial length (m)
+l_0_spring = 1  # unstreched spring (m)
+k_spring = 5    # spring constant (N/m)
+m = 0.5 #(kg)
+g = 9.8 #(m/s^2)
+mu = 0.1 #dampaning co-efficent
+
+ball = sphere(pos=fix_point.pos + vec(0, -l_0, 0), mass = m, v = vec(0,0,0), 
+    radius = 0.1, color=color.blue)
+    
+spring = helix(pos=fix_point.pos, axis=ball.pos-fix_point.pos, 
+    radius=0.1, color=color.orange)
+    
+vg = graph(title='Velocity', xtitle='t', ytitle='v(t)')
+vx_b = gcurve(graph=vg, color=color.cyan)
+vy_b = gcurve(graph=vg, color=color.magenta)
+
+pg = graph(title='Potential Energy', xtitle='t', ytitle='U')
+px_b = gcurve(graph=pg, color=color.cyan)
+py_b = gcurve(graph=pg, color=color.magenta)
+
+wg = graph(title='Work done by gravitational force', xtitle='t', ytitle='W_g')
+wx_b = gcurve(graph=wg, color=color.cyan)
+wy_b = gcurve(graph=wg, color=color.magenta)
+
+sx = graph(title='Spring Force', xtitle='t', ytitle='W_g')
+sxx_b = gcurve(graph=sx, color=color.magenta)
+sxy_b = gcurve(graph=sx, color=color.cyan) 
+
+ws = graph(title='Work done by spring force', xtitle='t', ytitle='W_s')
+wsx_b = gcurve(graph=ws, color=color.magenta)
+wsy_b =   gcurve(graph=ws, color=color.magenta)
+
+ke = graph(title='kentic energy', xtitle='t', ytitle='KE')
+kex_b = gcurve(graph=ke, color=color.magenta)
+key_b = gcurve(graph=ke, color=color.cyan)
+
+scene.waitfor('click')
+
+myrate = 200
+
+ball.p = ball.mass*ball.v
+
+t = 0 #(s)
+dt = 0.01
+
+ball.old_v = ball.v
+ball.T = 0
+
+while t < 50:
+    
+    rate(myrate)
+    
+    spring.pos = fix_point.pos #origin of spring
+    
+    spring.axis = ball.pos - fix_point.pos #the y axis where the spring will be
+    
+    l = ball.pos - fix_point.pos # is the lenth of the orgin to the ball
+    
+    F_grav = vec(0, -g*ball.mass, 0)*mu # force of gravity is the mg of y axis * mu 
+    
+    Lhat = l/mag(l) #To calculate the angle between two vectors (the "difference" of the angles of the two vectors).
+    
+    s = mag(l) - l_0 # the length of the orgin to the ball minus the unstreached spring
+  
+    F_spring = -k_spring * s * Lhat # force of spring is sopring constant * the length of the orgin to the ball minus the unstreached spring 
+                                    #  * angle between two vectors (the "difference" of the angles of the two vectors)
+   
+    F_net = F_grav + F_spring  # Net force 
+   
+    ball.p = ball.p + F_net*dt # updated momentum principle 
+    
+    ball.pos = ball.pos + (ball.p/ball.mass) * dt # updated postion from updated momentum principle 
+    
+    ball.v = ball.p/ball.mass # updated velocity
+    
+    spring.axis = ball.pos - fix_point.pos
+    
+    wF_spring = 0.5 * F_spring
+
+    U = ball.mass* (-g) * ball.pos 
+    W = -U 
+    
+    KE = 0.5 * ball.mass * mag2(ball.v)
+
+    vx_b.plot(pos=(t, ball.v.x))
+    vy_b.plot(pos=(t, ball.v.y))
+    
+    px_b.plot(pos=(t, U.x))
+    py_b.plot(pos=(t, U.y))
+    
+    wx_b.plot(pos=(t, W.x))
+    wy_b.plot(pos=(t, W.y))
+    
+    sxx_b.plot(pos=(t, F_spring.x))
+    sxy_b.plot(pos=(t, F_spring.y))
+    
+    wsx_b.plot(pos=(t, wF_spring.x))
+    wsy_b.plot(pos=(t, wF_spring.y))
+    
+    kex_b.plot(pos=(t, KE))
+    key_b.plot(pos=(t, KE))
+    
+    t = t + dt
+    
+    if ball.old_v.y > 0 and ball.v.y <0:
+        print("Period:", ball.T, 2*pi*sqrt(ball.mass/k_spring))
+        ball.T = 0
+        
+    ball.old_v = ball.v
+    ball.T = ball.T + dt
