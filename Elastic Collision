@@ -1,0 +1,99 @@
+Web VPython 3.2
+
+R = 0.05
+ball1 = sphere(pos=vec(-0.5, 0, 0), radius = R, color=color.white)
+ball2 = sphere(pos=vec(0, 0, 0), radius = R, color=color.green)
+
+ball1.mass = 0.1
+ball2.mass = 0.15
+
+ball1.v = vec(0.65, 0, 0)
+ball2.v = vec(0, 0, 0)
+
+ball1.p = ball1.mass * ball1.v
+ball2.p = ball2.mass * ball2.v
+
+gv1 = graph(title = 'V1(t)', xtitle = 't', ytitle = 'v1')
+gv2 = graph(title = 'V2(t)', xtitle = 't', ytitle = 'v2')
+
+v1_plot_V_x = gcurve(graph = gv1, color = color.green)
+v1_plot_V_y = gcurve(graph = gv1, color = color.green)
+
+v2_plot_V_x = gcurve(graph = gv2, color = color.green)
+v2_plot_V_y = gcurve(graph = gv2, color = color.green)
+
+gp1 = graph(title = 'P1(t)', xtitle = 't', ytitle = 'p1')
+gp2 = graph(title = 'P2(t)', xtitle = 't', ytitle = 'p2')
+
+p1_plot_P_x = gcurve(graph = gp1, color = color.green)
+p1_plot_P_y = gcurve(graph = gp1, color = color.green)
+
+p2_plot_P_x = gcurve(graph = gp2, color = color.green)
+p2_plot_P_y = gcurve(graph = gp2, color = color.green)
+
+ge1 = graph(title = 'E1(t)', xtitle = 't', ytitle = 'E1')
+ge2 = graph(title = 'E2(t)', xtitle = 't', ytitle = 'E2')
+
+e1_plot_E_x = gcurve(graph = ge1, color = color.green)
+e1_plot_E_y = gcurve(graph = ge1, color = color.green)
+
+e2_plot_E_x = gcurve(graph = ge2, color = color.green)
+e2_plot_E_y = gcurve(graph = ge2, color = color.green)
+
+t = 0
+dt = 0.01
+
+k = 100
+
+g = 9.8
+
+while t < 2:
+    
+  rate(100)
+  
+  FA = vector(0,0,0)
+  
+  a = ball2.pos - ball1.pos
+  
+  if mag(a) < 2 * R:
+    FA = -k * a
+    
+  ball1.p = ball1.p + FA*dt
+  ball2.p = ball2.p - FA*dt
+  
+  ball1.pos = ball1.pos + ball1.p * dt / ball1.mass
+  ball2.pos = ball2.pos + ball2.p * dt / ball2.mass
+  
+  ballK1 = 0.5 * ball1.mass * (mag(ball1.v))^2
+  ballK2 = 0.5 * ball2.mass * (mag(ball2.v))^2
+  
+  ballU1 = mag(g * ball1.mass * ball1.pos)
+  ballU2 = mag(g * ball2.mass * ball2.pos)
+  
+  ballt = ball1.p + ball2.p
+  print('Total Momentum:', ballt)
+  
+  ballE1 = ballK1 + ballU1
+  ballE2 = ballK2 + ballU2
+  
+  ballE = ballE1 + ballE2
+  print('Total Energy:', ballE)
+  
+  v1_plot_V_x.plot(pos = (t, ball1.v.x))
+  v1_plot_V_y.plot(pos = (t, ball1.v.y))
+  
+  v2_plot_V_x.plot(pos = (t, ball2.v.x))
+  v2_plot_V_y.plot(pos = (t, ball2.v.y))
+
+  p1_plot_P_x.plot(pos = (t, ball1.p.x))
+  p1_plot_P_x.plot(pos = (t, ball1.p.y))
+  
+  p2_plot_P_x.plot(pos = (t, ball2.p.x))
+  p2_plot_P_y.plot(pos = (t, ball2.p.y))
+
+  e1_plot_E_x.plot(pos = (t, ballE1))
+
+  e2_plot_E_x.plot(pos = (t, ballE2))
+
+  
+  t = t + dt
